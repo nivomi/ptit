@@ -494,9 +494,25 @@ function setWatch($id,$addToWatch){
 		</div>
 	</div>
 	<?php endif; ?>
-	<div id="footer">
-		Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
-	</div>
+	<footer class="row">
+		<div class="large-12 columns">
+			<hr/>
+			<div class="row">
+				<div class="large-6 columns">
+					Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
+				</div>
+			</div>
+			<div class="large-6 columns">
+				<?php
+					foreach($STATUSES as $code=>$name) {
+						$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
+						echo "<a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a> | ";
+					}
+				?>
+				<a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a>
+			</div>
+		</div>	
+	</footer>
 </div>
   <script>
   document.write('<script src=<?php echo $VENDOR_JS?>' +
