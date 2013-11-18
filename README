@@ -1,7 +1,7 @@
 Pretty Tiny Issue Tracker
 -------------------------
 
-Pretty Tiny Issue Tracker (PTIT) is a PHP/PDO based, single-page issue tracker. Originally and mainly developed by [Jwalanta](https://github.com/jwalanta/tit)https://github.com/jwalanta/tit and mixed with [Foundation](foundation.zurb.com).
+Pretty Tiny Issue Tracker (PTIT) is a PHP/PDO based, single-page issue tracker. Originally and mainly developed by [Jwalanta](https://github.com/jwalanta/tit) and mixed with [Foundation](foundation.zurb.com).
 
 DEMO
 ----
