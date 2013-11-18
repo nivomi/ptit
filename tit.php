@@ -354,147 +354,170 @@ function setWatch($id,$addToWatch){
 
 </head>
 <body>
-<div id='container'>
-	<div id="menu">
+
+<!-- Header and Nav -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <!-- Title Area -->
+      <li class="name">
+        <h1>
+          <a href="<?php echo $_SERVER['PHP_SELF']; ?>?status=0">
+            <?php echo $TITLE; ?>
+          </a>
+        </h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <!-- Left Nav Section -->
+      <ul class="left">
+
+        <li class="has-form"><a class="button <?php echo ($issue['id']==''?"success":""); ?>" href="#" onclick="document.getElementById('create').className='';document.getElementById('title').focus();"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></li>
+		</li>
+       
+      </ul>
+
+      <!-- Right Nav Section -->
+      <ul class="right">
+        <li class="divider"></li>
 		<?php
 			foreach($STATUSES as $code=>$name) {
-				$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
-				echo "<a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a> | ";
+				$activeclass=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"active'":"";
+				echo "<li class='divider $activeclass'></li><li><a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' >{$name} Issues</a></li> ";
 			}
 		?>
-		<a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a>
+		 <li class="divider"></li><li class="has-form"><a class="button alert" href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a></li>
+      </ul>
+    </section>
+  </nav>
+
+<div id="create" class='<?php echo isset($_GET['editissue'])?'':'hide'; ?>'>
+	<a href="#" onclick="document.getElementById('create').className='hide';" style="float: right;">[Close]</a>
+	<form method="POST">
+		<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
+		<label>Title</label><input type="text" size="50" name="title" id="title" value="<?php echo htmlentities($issue['title']); ?>" />
+		<label>Description</label><textarea name="description" rows="5" cols="50"><?php echo htmlentities($issue['description']); ?></textarea>
+		<label></label><input type="submit" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
+<? if (!$issue['id']) { ?>
+		Priority
+			<select name="priority">
+				<option value="1">High</option>
+				<option selected value="2">Medium</option>
+				<option value="3">Low</option>
+			</select>
+<? } ?>
+	</form>
+</div>
+
+<?php if ($mode=="list"): ?>
+<div id="list">
+<h2><?php if (isset($STATUSES[$_GET['status']])) echo $STATUSES[$_GET['status']]." "; ?>Issues</h2>
+	<table border=1 cellpadding=5 width="100%">
+		<tr>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Created by</th>
+			<th>Date</th>
+			<th><acronym title="Watching issue?">W</acronym></th>
+			<th>Last Comment</th>
+			<th>Actions</th>
+		</tr>
+		<?php
+		$count=1;
+		foreach ($issues as $issue){
+			$count++;
+			echo "<tr class='p{$issue['priority']}'>\n";
+			echo "<td>{$issue['id']}</a></td>\n";
+			echo "<td><a href='?id={$issue['id']}'>".htmlentities($issue['title'],ENT_COMPAT,"UTF-8")."</a></td>\n";
+			echo "<td>{$issue['user']}</td>\n";
+			echo "<td>{$issue['entrytime']}</td>\n";
+			echo "<td>".($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])!==FALSE?"&#10003;":"")."</td>\n";
+			echo "<td>".($issue['comment_user'] ? date("M j",strtotime($issue['comment_time'])) . " (" . $issue['comment_user'] . ")" : "")."</td>\n";
+			echo "<td><a href='?editissue&id={$issue['id']}'>Edit</a>";
+			if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " | <a href='?deleteissue&id={$issue['id']}' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
+			echo "</td>\n";
+			echo "</tr>\n";
+		}
+		?>
+	</table>
+</div>
+<?php endif; ?>
+
+<?php if ($mode=="issue"): ?>
+<div id="show">
+	<div class="issue">
+		<h2><?php echo htmlentities($issue['title'],ENT_COMPAT,"UTF-8"); ?></h2>
+		<p><?php echo nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>", htmlentities($issue['description'],ENT_COMPAT,"UTF-8") ) ); ?></p>
 	</div>
-
-	<h1><?php echo $TITLE; ?></h1>
-
-	<h2><a href="#" onclick="document.getElementById('create').className='';document.getElementById('title').focus();"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></h2>
-	<div id="create" class='<?php echo isset($_GET['editissue'])?'':'hide'; ?>'>
-		<a href="#" onclick="document.getElementById('create').className='hide';" style="float: right;">[Close]</a>
+	<div class='left'>
+		Priority <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
+			<option value="1"<?php echo ($issue['priority']==1?"selected":""); ?>>High</option>
+			<option value="2"<?php echo ($issue['priority']==2?"selected":""); ?>>Medium</option>
+			<option value="3"<?php echo ($issue['priority']==3?"selected":""); ?>>Low</option>
+		</select>
+		Status <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
+		<?php foreach($STATUSES as $code=>$name): ?>
+			<option value="<?php echo $code; ?>"<?php echo ($issue['status']==$code?"selected":""); ?>><?php echo $name; ?></option>
+		<?php endforeach; ?>
+		</select>
+	</div>
+	<div class='left'>
 		<form method="POST">
 			<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
-			<label>Title</label><input type="text" size="50" name="title" id="title" value="<?php echo htmlentities($issue['title']); ?>" />
-			<label>Description</label><textarea name="description" rows="5" cols="50"><?php echo htmlentities($issue['description']); ?></textarea>
-			<label></label><input type="submit" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
-<? if (!$issue['id']) { ?>
-			Priority
-				<select name="priority">
-					<option value="1">High</option>
-					<option selected value="2">Medium</option>
-					<option value="3">Low</option>
-				</select>
-<? } ?>
+			<?php
+				if ($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])===FALSE)
+					echo "<input type='submit' name='watch' value='Watch' />\n";
+				else
+					echo "<input type='submit' name='unwatch' value='Unwatch' />\n";
+			?>
 		</form>
 	</div>
-
-	<?php if ($mode=="list"): ?>
-	<div id="list">
-	<h2><?php if (isset($STATUSES[$_GET['status']])) echo $STATUSES[$_GET['status']]." "; ?>Issues</h2>
-		<table border=1 cellpadding=5 width="100%">
-			<tr>
-				<th>ID</th>
-				<th>Title</th>
-				<th>Created by</th>
-				<th>Date</th>
-				<th><acronym title="Watching issue?">W</acronym></th>
-				<th>Last Comment</th>
-				<th>Actions</th>
-			</tr>
-			<?php
-			$count=1;
-			foreach ($issues as $issue){
-				$count++;
-				echo "<tr class='p{$issue['priority']}'>\n";
-				echo "<td>{$issue['id']}</a></td>\n";
-				echo "<td><a href='?id={$issue['id']}'>".htmlentities($issue['title'],ENT_COMPAT,"UTF-8")."</a></td>\n";
-				echo "<td>{$issue['user']}</td>\n";
-				echo "<td>{$issue['entrytime']}</td>\n";
-				echo "<td>".($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])!==FALSE?"&#10003;":"")."</td>\n";
-				echo "<td>".($issue['comment_user'] ? date("M j",strtotime($issue['comment_time'])) . " (" . $issue['comment_user'] . ")" : "")."</td>\n";
-				echo "<td><a href='?editissue&id={$issue['id']}'>Edit</a>";
-				if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " | <a href='?deleteissue&id={$issue['id']}' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
-				echo "</td>\n";
-				echo "</tr>\n";
-			}
-			?>
-		</table>
-	</div>
-	<?php endif; ?>
-
-	<?php if ($mode=="issue"): ?>
-	<div id="show">
-		<div class="issue">
-			<h2><?php echo htmlentities($issue['title'],ENT_COMPAT,"UTF-8"); ?></h2>
-			<p><?php echo nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>", htmlentities($issue['description'],ENT_COMPAT,"UTF-8") ) ); ?></p>
-		</div>
-		<div class='left'>
-			Priority <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
-				<option value="1"<?php echo ($issue['priority']==1?"selected":""); ?>>High</option>
-				<option value="2"<?php echo ($issue['priority']==2?"selected":""); ?>>Medium</option>
-				<option value="3"<?php echo ($issue['priority']==3?"selected":""); ?>>Low</option>
-			</select>
-			Status <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
-			<?php foreach($STATUSES as $code=>$name): ?>
-				<option value="<?php echo $code; ?>"<?php echo ($issue['status']==$code?"selected":""); ?>><?php echo $name; ?></option>
-			<?php endforeach; ?>
-			</select>
-		</div>
-		<div class='left'>
+	<div class='clear'></div>
+	<div id="comments">
+		<?php
+		if (count($comments)>0) echo "<h3>Comments</h3>\n";
+		foreach ($comments as $comment){
+			echo "<div class='comment'><p>".nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>",htmlentities($comment['description'],ENT_COMPAT,"UTF-8") ) )."</p>";
+			echo "<div class='comment-meta'><em>{$comment['user']}</em> on <em>{$comment['entrytime']}</em> ";
+			if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$comment['user']) echo "<span class='right'><a href='{$_SERVER['PHP_SELF']}?deletecomment&id={$issue['id']}&cid={$comment['id']}' onclick='return confirm(\"Are you sure?\");'>Delete</a></span>";
+			echo "</div></div>\n";
+		}
+		?>
+		<div id="comment-create">
+			<h4>Post a comment</h4>
 			<form method="POST">
-				<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
-				<?php
-					if ($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])===FALSE)
-						echo "<input type='submit' name='watch' value='Watch' />\n";
-					else
-						echo "<input type='submit' name='unwatch' value='Unwatch' />\n";
-				?>
+				<input type="hidden" name="issue_id" value="<?php echo $issue['id']; ?>" />
+				<textarea name="description" rows="5" cols="50"></textarea>
+				<label></label>
+				<input type="submit" name="createcomment" value="Comment" />
 			</form>
 		</div>
-		<div class='clear'></div>
-		<div id="comments">
-			<?php
-			if (count($comments)>0) echo "<h3>Comments</h3>\n";
-			foreach ($comments as $comment){
-				echo "<div class='comment'><p>".nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>",htmlentities($comment['description'],ENT_COMPAT,"UTF-8") ) )."</p>";
-				echo "<div class='comment-meta'><em>{$comment['user']}</em> on <em>{$comment['entrytime']}</em> ";
-				if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$comment['user']) echo "<span class='right'><a href='{$_SERVER['PHP_SELF']}?deletecomment&id={$issue['id']}&cid={$comment['id']}' onclick='return confirm(\"Are you sure?\");'>Delete</a></span>";
-				echo "</div></div>\n";
-			}
-			?>
-			<div id="comment-create">
-				<h4>Post a comment</h4>
-				<form method="POST">
-					<input type="hidden" name="issue_id" value="<?php echo $issue['id']; ?>" />
-					<textarea name="description" rows="5" cols="50"></textarea>
-					<label></label>
-					<input type="submit" name="createcomment" value="Comment" />
-				</form>
+	</div>
+</div>
+<?php endif; ?>
+<footer class="row">
+	<div class="large-12 columns">
+		<hr/>
+		<div class="row">
+			<div class="large-6 columns">
+				Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
+			</div>
+
+			<div class="large-6 columns">
+				<ul class="inline-list right">
+					<?php
+						foreach($STATUSES as $code=>$name) {
+							$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
+							echo "<li><a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a></li>\n ";
+						}
+					?>
+					<li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a></li>
+				</ul>
 			</div>
 		</div>
 	</div>
-	<?php endif; ?>
-	<footer class="row">
-		<div class="large-12 columns">
-			<hr/>
-			<div class="row">
-				<div class="large-6 columns">
-					Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
-				</div>
-
-				<div class="large-6 columns">
-					<ul class="inline-list right">
-						<?php
-							foreach($STATUSES as $code=>$name) {
-								$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
-								echo "<li><a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a></li>\n ";
-							}
-						?>
-						<li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</footer>
-</div>
+</footer>
   <script>
   document.write('<script src=<?php echo $VENDOR_JS?>' +
   ('__proto__' in {} ? 'zepto' : 'jquery') +
