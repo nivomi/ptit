@@ -355,19 +355,20 @@ function setWatch($id,$addToWatch){
 </head>
 <body>
   <div id="createModal" class="reveal-modal">
-	<form method="POST">
+	<form class="custom" method="POST">
 		<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
 		<label>Title</label><input type="text" size="50" name="title" id="title" value="<?php echo htmlentities($issue['title']); ?>" />
 		<label>Description</label><textarea name="description" rows="5" cols="50"><?php echo htmlentities($issue['description']); ?></textarea>
-		<label></label><input type="submit" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
+		<label></label>
 		<? if (!$issue['id']) { ?>
-		Priority
-			<select name="priority">
+			<label for="modalpriority">Priority</label>
+			<select name="priority" id="modalpriority">
 				<option value="1">High</option>
 				<option selected value="2">Medium</option>
 				<option value="3">Low</option>
 			</select>
 		<? } ?>
+		<input type="submit" class="button" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
 	</form>
 </div>
 <!-- Header and Nav -->
@@ -433,8 +434,8 @@ function setWatch($id,$addToWatch){
 			echo "<td>{$issue['entrytime']}</td>\n";
 			echo "<td>".($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])!==FALSE?"&#10003;":"")."</td>\n";
 			echo "<td>".($issue['comment_user'] ? date("M j",strtotime($issue['comment_time'])) . " (" . $issue['comment_user'] . ")" : "")."</td>\n";
-			echo "<td><a href='?editissue&id={$issue['id']}'>Edit</a>";
-			if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " | <a href='?deleteissue&id={$issue['id']}' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
+			echo "<td><a class='button tiny secondary' href='?editissue&id={$issue['id']}'>Edit</a>";
+			if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " | <a href='?deleteissue&id={$issue['id']}' class='button tiny alert' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
 			echo "</td>\n";
 			echo "</tr>\n";
 		}
@@ -449,26 +450,28 @@ function setWatch($id,$addToWatch){
 		<h2><?php echo htmlentities($issue['title'],ENT_COMPAT,"UTF-8"); ?></h2>
 		<p><?php echo nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>", htmlentities($issue['description'],ENT_COMPAT,"UTF-8") ) ); ?></p>
 	</div>
-	<div class='left'>
-		Priority <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
+	<form class='custom'>
+		<label for="priority">Priority</label>
+		<select class="custom dropdown" id="priority" name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
 			<option value="1"<?php echo ($issue['priority']==1?"selected":""); ?>>High</option>
 			<option value="2"<?php echo ($issue['priority']==2?"selected":""); ?>>Medium</option>
 			<option value="3"<?php echo ($issue['priority']==3?"selected":""); ?>>Low</option>
 		</select>
-		Status <select name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
+		<label for="status">Status</label>
+		<select class="custom dropdown"name="priority" id="status" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
 		<?php foreach($STATUSES as $code=>$name): ?>
 			<option value="<?php echo $code; ?>"<?php echo ($issue['status']==$code?"selected":""); ?>><?php echo $name; ?></option>
 		<?php endforeach; ?>
 		</select>
-	</div>
+	</form>
 	<div class='left'>
 		<form method="POST">
 			<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
 			<?php
 				if ($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])===FALSE)
-					echo "<input type='submit' name='watch' value='Watch' />\n";
+					echo "<input type='submit' class='button secondary small' name='watch' value='Watch' />\n";
 				else
-					echo "<input type='submit' name='unwatch' value='Unwatch' />\n";
+					echo "<input type='submit' class='button alert small' name='unwatch' value='Unwatch' />\n";
 			?>
 		</form>
 	</div>
@@ -489,7 +492,7 @@ function setWatch($id,$addToWatch){
 				<input type="hidden" name="issue_id" value="<?php echo $issue['id']; ?>" />
 				<textarea name="description" rows="5" cols="50"></textarea>
 				<label></label>
-				<input type="submit" name="createcomment" value="Comment" />
+				<input type="submit" class="button small" name="createcomment" value="Comment" />
 			</form>
 		</div>
 	</div>
