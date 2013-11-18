@@ -20,7 +20,7 @@ if (!defined("TIT_INCLUSION"))
 	$FOUNDATION_CSS = "css/foundation.min.css";			// location for Foundation CSS file
 	$FOUNDATION_JS = "js/foundation.min.js";
 	$NORMALIZE_CSS = "css/normalize.css"; 				// location for Normalize CSS file
-	$MODERNIZE_JS = "js/custom.modernizr.js";			// loctaion for Modernizr.js file
+	$MODERNIZE_JS = "js/vendor/custom.modernizr.js";			// loctaion for Modernizr.js file
 	$VENDOR_JS = "js/vendor/";							// location for JQuery and Zepto js files
 	// Array of users.
 	// Mandatory fields: username, password (md5 hash)
@@ -388,7 +388,7 @@ function setWatch($id,$addToWatch){
       <!-- Left Nav Section -->
       <ul class="left">
 
-        <li class="has-form"><a class="button <?php echo ($issue['id']==''?"success":""); ?>" href="#" data-reveal-id="createModal"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></li>
+        <li class="has-form"><a class="button <?php echo ($issue['id']==''?"success":""); ?>" href="#" data-reveal-id="createModal" id="my-trigger"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></li>
 		</li>
        
       </ul>
@@ -527,5 +527,10 @@ function setWatch($id,$addToWatch){
     $(document).foundation();
   </script>
 
+<?php echo isset($_GET["editissue"])?'
+<script>
+$(\'#my-trigger\').trigger(\'click\');
+</script>':'' ;
+?>
 </body>
 </html>
