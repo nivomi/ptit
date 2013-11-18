@@ -354,7 +354,22 @@ function setWatch($id,$addToWatch){
 
 </head>
 <body>
-
+  <div id="createModal" class="reveal-modal">
+	<form method="POST">
+		<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
+		<label>Title</label><input type="text" size="50" name="title" id="title" value="<?php echo htmlentities($issue['title']); ?>" />
+		<label>Description</label><textarea name="description" rows="5" cols="50"><?php echo htmlentities($issue['description']); ?></textarea>
+		<label></label><input type="submit" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
+		<? if (!$issue['id']) { ?>
+		Priority
+			<select name="priority">
+				<option value="1">High</option>
+				<option selected value="2">Medium</option>
+				<option value="3">Low</option>
+			</select>
+		<? } ?>
+	</form>
+</div>
 <!-- Header and Nav -->
   <nav class="top-bar">
     <ul class="title-area">
@@ -373,7 +388,7 @@ function setWatch($id,$addToWatch){
       <!-- Left Nav Section -->
       <ul class="left">
 
-        <li class="has-form"><a class="button <?php echo ($issue['id']==''?"success":""); ?>" href="#" onclick="document.getElementById('create').className='';document.getElementById('title').focus();"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></li>
+        <li class="has-form"><a class="button <?php echo ($issue['id']==''?"success":""); ?>" href="#" data-reveal-id="createModal"><?php echo ($issue['id']==''?"Create":"Edit"); ?> Issue <?php echo $issue['id'] ?></a></li>
 		</li>
        
       </ul>
@@ -392,23 +407,7 @@ function setWatch($id,$addToWatch){
     </section>
   </nav>
 
-<div id="create" class='<?php echo isset($_GET['editissue'])?'':'hide'; ?>'>
-	<a href="#" onclick="document.getElementById('create').className='hide';" style="float: right;">[Close]</a>
-	<form method="POST">
-		<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
-		<label>Title</label><input type="text" size="50" name="title" id="title" value="<?php echo htmlentities($issue['title']); ?>" />
-		<label>Description</label><textarea name="description" rows="5" cols="50"><?php echo htmlentities($issue['description']); ?></textarea>
-		<label></label><input type="submit" name="createissue" value="<?php echo ($issue['id']==''?"Create":"Edit"); ?>" />
-<? if (!$issue['id']) { ?>
-		Priority
-			<select name="priority">
-				<option value="1">High</option>
-				<option selected value="2">Medium</option>
-				<option value="3">Low</option>
-			</select>
-<? } ?>
-	</form>
-</div>
+
 
 <?php if ($mode=="list"): ?>
 <div id="list">
@@ -527,5 +526,6 @@ function setWatch($id,$addToWatch){
   <script>
     $(document).foundation();
   </script>
+
 </body>
 </html>
