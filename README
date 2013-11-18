@@ -1,13 +1,11 @@
-Tiny Issue Tracker
-------------------
+Pretty Tiny Issue Tracker
+-------------------------
 
-Tiny Issue Tracker (TIT) is PHP/PDO based, single-file issue tracker.
+Pretty Tiny Issue Tracker (PTIT) is a PHP/PDO based, single-page issue tracker. Originally and mainly developed by [Jwalanta](https://github.com/jwalanta/tit)https://github.com/jwalanta/tit and mixed with [Foundation](foundation.zurb.com).
 
 DEMO
 ----
-http://diyaalo.com/tit
-username, password = demo, demo123
-Check email notifications at http://demo123.mailinator.com/
+Coming when the rest is done
 
 FEATURES
 --------
