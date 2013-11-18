@@ -434,36 +434,40 @@ function setWatch($id,$addToWatch){
 
 
 <?php if ($mode=="list"): ?>
-	<div id="list">
-		<h2><?php if (isset($STATUSES[$_GET['status']])) echo $STATUSES[$_GET['status']]." "; ?>Issues</h2>
-		<table border=1 cellpadding=5 width="100%">
-			<tr>
-				<th>ID</th>
-				<th>Title</th>
-				<th>Created by</th>
-				<th>Date</th>
-				<th><acronym title="Watching issue?">W</acronym></th>
-				<th>Last Comment</th>
-				<th>Actions</th>
-			</tr>
-			<?php
-			$count=1;
-			foreach ($issues as $issue){
-				$count++;
-				echo "<tr class='p{$issue['priority']}'>\n";
-				echo "<td>{$issue['id']}</a></td>\n";
-				echo "<td><a href='?id={$issue['id']}'>".htmlentities($issue['title'],ENT_COMPAT,"UTF-8")."</a></td>\n";
-				echo "<td>{$issue['user']}</td>\n";
-				echo "<td>{$issue['entrytime']}</td>\n";
-				echo "<td>".($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])!==FALSE?"&#10003;":"")."</td>\n";
-				echo "<td>".($issue['comment_user'] ? date("M j",strtotime($issue['comment_time'])) . " (" . $issue['comment_user'] . ")" : "")."</td>\n";
-				echo "<td><a class='button tiny secondary' href='?editissue&id={$issue['id']}'>Edit</a>";
-				if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " | <a href='?deleteissue&id={$issue['id']}' class='button tiny alert' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
-				echo "</td>\n";
-				echo "</tr>\n";
-			}
-			?>
-		</table>
+	<div class='row'>
+		<div class='columns large-11 large-centered' id="list">
+			<h2><?php if (isset($STATUSES[$_GET['status']])) echo $STATUSES[$_GET['status']]." "; ?>Issues</h2>
+			<table>
+				<thead>
+					<tr>
+						<th width='25'>ID</th>
+						<th>Title</th>
+						<th width='100'>Created by</th>
+						<th>Date</th>
+						<th width='10'><acronym title="Watching issue?">W</acronym></th>
+						<th>Last Comment</th>
+						<th width='110'>Actions</th>
+					</tr>
+				</thead>
+				<?php
+				$count=1;
+				foreach ($issues as $issue){
+					$count++;
+					echo "<tr class='p{$issue['priority']}'>\n";
+					echo "<td>{$issue['id']}</a></td>\n";
+					echo "<td><a href='?id={$issue['id']}'>".htmlentities($issue['title'],ENT_COMPAT,"UTF-8")."</a></td>\n";
+					echo "<td>{$issue['user']}</td>\n";
+					echo "<td>{$issue['entrytime']}</td>\n";
+					echo "<td>".($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])!==FALSE?"&#10003;":"")."</td>\n";
+					echo "<td>".($issue['comment_user'] ? date("M j",strtotime($issue['comment_time'])) . " (" . $issue['comment_user'] . ")" : "")."</td>\n";
+					echo "<td><a class='button tiny secondary' href='?editissue&id={$issue['id']}'>Edit</a>";
+					if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$issue['user']) echo " <a href='?deleteissue&id={$issue['id']}' class='button tiny alert' onclick='return confirm(\"Are you sure? All comments will be deleted too.\");'>Delete</a>";
+					echo "</td>\n";
+					echo "</tr>\n";
+				}
+				?>
+			</table>
+		</div>
 	</div>
 <?php endif; ?>
 
