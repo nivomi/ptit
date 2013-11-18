@@ -15,7 +15,13 @@ if (!defined("TIT_INCLUSION"))
 {
 	$TITLE = "My Project";              // Project Title
 	$EMAIL = "noreply@example.com";     // "From" email address for notifications
-
+	
+	//foundation locations - defaults should be fine unless you have a reason to change them
+	$FOUNDATION_CSS = "css/foundation.min.css";			// location for Foundation CSS file
+	$FOUNDATION_JS = "js/foundation.min.js";
+	$NORMALIZE_CSS = "css/normalize.css"; 				// location for Normalize CSS file
+	$MODERNIZE_JS = "js/custom.modernizr.js";			// loctaion for Modernizr.js file
+	$VENDOR_JS = "js/vendor/";							// location for JQuery and Zepto js files
 	// Array of users.
 	// Mandatory fields: username, password (md5 hash)
 	// Optional fields: email, admin (true/false)
@@ -334,12 +340,17 @@ function setWatch($id,$addToWatch){
 }
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
+  	<meta charset="utf-8" />
+  	<meta name="viewport" content="width=device-width" />
 	<title><?php echo $TITLE, isset($_GET["id"]) ? (" - #".$_GET["id"]) : "" , " - Issue Tracker"; ?></title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	  <!-- Included CSS Files -->
+	  <link rel="stylesheet" href="<?php echo $NORMALIZE_CSS?>">
+	  <link rel="stylesheet" href="<?php echo $FOUNDATION_CSS?>">
+	  <script src="<?php echo $MODERNIZE_JS?>"></script>
 	<style>
 		html { overflow-y: scroll;}
 		body { font-family: sans-serif; font-size: 11px; background-color: #aaa;}
@@ -487,5 +498,14 @@ function setWatch($id,$addToWatch){
 		Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
 	</div>
 </div>
+  <script>
+  document.write('<script src=<?php echo $VENDOR_JS?>' +
+  ('__proto__' in {} ? 'zepto' : 'jquery') +
+  '.js><\/script>')
+  </script>
+  <script src="<?php echo $FOUNDATION_JS ?>"></script>
+  <script>
+    $(document).foundation();
+  </script>
 </body>
 </html>
