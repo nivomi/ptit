@@ -351,29 +351,7 @@ function setWatch($id,$addToWatch){
 	  <link rel="stylesheet" href="<?php echo $NORMALIZE_CSS?>">
 	  <link rel="stylesheet" href="<?php echo $FOUNDATION_CSS?>">
 	  <script src="<?php echo $MODERNIZE_JS?>"></script>
-	<style>
-		html { overflow-y: scroll;}
-		body { font-family: sans-serif; font-size: 11px; background-color: #aaa;}
-		a, a:visited{color:#004989; text-decoration:none;}
-		a:hover{color: #666; text-decoration: underline;}
-		label{ display: block; font-weight: bold;}
-		table{border-collapse: collapse;}
-		th{text-align: left; background-color: #f2f2f2;}
-		tr:hover{background-color: #f0f0f0;}
-		#menu{float: right;}
-		#container{width: 760px; margin: 0 auto; padding: 20px; background-color: #fff;}
-		#footer{padding:10px 0 0 0; margin-top: 20px; text-align: center; border-top: 1px solid #ccc;}
-		#create{padding: 15px; background-color: #f2f2f2;}
-		.issue{padding:10px 20px; margin: 10px 0; background-color: #f2f2f2;}
-		.comment{padding:5px 10px 10px 10px; margin: 10px 0; border: 1px solid #ccc;}
-		.comment-meta{color: #666;}
-		.p1, .p1 a{color: red;}
-		.p3, .p3 a{color: #666;}
-		.hide{display:none;}
-		.left{float: left;}
-		.right{float: right;}
-		.clear{clear:both;}
-	</style>
+
 </head>
 <body>
 <div id='container'>
@@ -501,17 +479,20 @@ function setWatch($id,$addToWatch){
 				<div class="large-6 columns">
 					Powered by <a href="https://github.com/jwalanta/tit" alt="Tiny Issue Tracker" target="_blank">Tiny Issue Tracker</a>
 				</div>
+
+				<div class="large-6 columns">
+					<ul class="inline-list right">
+						<?php
+							foreach($STATUSES as $code=>$name) {
+								$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
+								echo "<li><a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a></li>\n ";
+							}
+						?>
+						<li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a></li>
+					</ul>
+				</div>
 			</div>
-			<div class="large-6 columns">
-				<?php
-					foreach($STATUSES as $code=>$name) {
-						$style=(isset($_GET[status]) && $_GET[status]==$code) || (isset($issue) && $issue['status']==$code)?"style='font-weight:bold;'":"";
-						echo "<a href='{$_SERVER['PHP_SELF']}?status={$code}' alt='{$name} Issues' $style>{$name} Issues</a> | ";
-					}
-				?>
-				<a href="<?php echo $_SERVER['PHP_SELF']; ?>?logout" alt="Logout">Logout [<?php echo $_SESSION['tit']['username']; ?>]</a>
-			</div>
-		</div>	
+		</div>
 	</footer>
 </div>
   <script>
