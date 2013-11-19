@@ -1,9 +1,9 @@
 <?php
 /*
- *      Tiny Issue Tracker (TIT) v2.0
- *      SQLite based, single file Issue Tracker
+ *      Pretty Tiny Issue Tracker (PTIT) v2.0
+ *      SQLite based, single page Issue Tracker featuring Foundation
  *
- *      Copyright 2010-2013 Jwalanta Shrestha <jwalanta at gmail dot com>
+ *      Copyright 2013 Nivek Hutchison <nivekhutchison at terribleideas dot org>
  *      GNU GPL
  */
 
@@ -20,8 +20,10 @@ if (!defined("TIT_INCLUSION"))
 	$FOUNDATION_CSS = "css/foundation.min.css";			// location for Foundation CSS file
 	$FOUNDATION_JS = "js/foundation.min.js";
 	$NORMALIZE_CSS = "css/normalize.css"; 				// location for Normalize CSS file
-	$MODERNIZE_JS = "js/vendor/custom.modernizr.js";			// loctaion for Modernizr.js file
+	$MODERNIZE_JS = "js/vendor/custom.modernizr.js";	// location for Modernizr.js file
 	$VENDOR_JS = "js/vendor/";							// location for JQuery and Zepto js files
+	$RESPONSIVETABLE_JS = "js/responsive-tables.js"; 	// location for responsive table js file - leave blank to disable mobile-responsive tables
+	$RESPONSIVETABLE_CSS = "css/responsive-tables.css"; // location for responsive table css file - leave blank to disable mobile-responsive tables
 	// Array of users.
 	// Mandatory fields: username, password (md5 hash)
 	// Optional fields: email, admin (true/false)
@@ -78,7 +80,7 @@ if (isset($_GET['logout'])){
 	header("Location: {$_SERVER['PHP_SELF']}");
 }
 
-if (isset($_GET['loginerror'])) $message = "<div class='alert-box alert' style='text-align:center'> Invalid username or password<a href='#' class='close'>&times;</a>
+if (isset($_GET['loginerror'])) $message = "<div class='row'><div class='alert-box alert large-6 large-centered columns' style='text-align:center'> Invalid username or password<a href='#' class='close'>&times;</a></div>
 </div>";
 
 $login_html = "<html><!DOCTYPE html>
@@ -89,22 +91,24 @@ $login_html = "<html><!DOCTYPE html>
 	<meta name='viewport' content='width=device-width' />
 	<title>Pretty Tiny Issue Tracker</title>
 	<!-- Included CSS Files -->
-	<link rel='stylesheet' href=' $NORMALIZE_CSS'>
+	<link rel='stylesheet' href='$NORMALIZE_CSS'>
 	<link rel='stylesheet' href='$FOUNDATION_CSS'>
 	<script src='$MODERNIZE_JS'></script>
 </head>
-<body><div class='row'><div class='large-6 small-centered columns'><h2 style='text-align:center'>$TITLE - Issue Tracker</h2>$message
-<form method='POST'>
-	<label>Username</label><input type='text' name='u' />
-	<label>Password</label><input type='password' name='p' />
-	<label></label><input class='button' type='submit' name='login' value='Login' />
-</form> </div>
-<script>
-	document.write('<script src=<?php echo $VENDOR_JS?>' +
-		('__proto__' in {} ? 'zepto' : 'jquery') +
-		'.js><\/script>')
+<body>
+	<div class='row'><div class='large-6 large-centered columns'><h2 style='text-align:center'>$TITLE - Issue Tracker</h2></div></div>
+	$message
+	<form method='POST'>
+		<div class='row'><div class='large-6 large-centered columns'><label>Username</label><input type='text' name='u' /></div></div>
+		<div class='row'><div class='large-6 large-centered columns'><label>Password</label><input type='password' name='p' /></div></div>
+		<div class='row'><div class='large-6 large-centered columns'><label></label><input class='button' type='submit' name='login' value='Login' /></div></div>
+	</form>
+	<script>
+		document.write('<script src=$VENDOR_JS' +
+			('__proto__' in {} ? 'zepto' : 'jquery') +
+			'.js><\/script>')
 </script>
-<script src='<?php echo $FOUNDATION_JS ?>'></script>
+<script src='$FOUNDATION_JS'></script>
 <script>
 	$(document).foundation();
 </script></body></html>";
@@ -367,6 +371,7 @@ function setWatch($id,$addToWatch){
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
+	<link type="text/css" media="screen" rel="stylesheet" href="<?php echo $RESPONSIVETABLE_CSS?>" />
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width" />
 	<title><?php echo $TITLE, isset($_GET["id"]) ? (" - #".$_GET["id"]) : "" , " - Issue Tracker"; ?></title>
@@ -437,7 +442,7 @@ function setWatch($id,$addToWatch){
 	<div class='row'>
 		<div class='columns large-11 large-centered' id="list">
 			<h2><?php if (isset($STATUSES[$_GET['status']])) echo $STATUSES[$_GET['status']]." "; ?>Issues</h2>
-			<table>
+			<table <?php if (isset($RESPONSIVETABLE_JS) && isset($RESPONSIVETABLE_CSS)) echo 'class="responsive"' ?> >
 				<thead>
 					<tr>
 						<th width='25'>ID</th>
@@ -472,58 +477,57 @@ function setWatch($id,$addToWatch){
 <?php endif; ?>
 
 <?php if ($mode=="issue"): ?>
-	<div id="show">
-		<div class="issue">
-			<h2><?php echo htmlentities($issue['title'],ENT_COMPAT,"UTF-8"); ?></h2>
-			<p><?php echo nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>", htmlentities($issue['description'],ENT_COMPAT,"UTF-8") ) ); ?></p>
-		</div>
-		<form class='custom'>
+	<div class='row'><h2><?php echo htmlentities($issue['title'],ENT_COMPAT,"UTF-8"); ?></h2></div>
+	<div class='row'><p class='panel radius'><?php echo nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>", htmlentities($issue['description'],ENT_COMPAT,"UTF-8") ) ); ?></p>
+	</div>
+	<form class='custom'>
+		<div class='row'>
 			<label for="priority">Priority</label>
-			<select class="custom dropdown" id="priority" name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
+			<select class="small" id="priority" name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changepriority&id=<?php echo $issue['id']; ?>&priority='+this.value">
 				<option value="1"<?php echo ($issue['priority']==1?"selected":""); ?>>High</option>
 				<option value="2"<?php echo ($issue['priority']==2?"selected":""); ?>>Medium</option>
 				<option value="3"<?php echo ($issue['priority']==3?"selected":""); ?>>Low</option>
 			</select>
+		</div>
+		<div class='row'>
 			<label for="status">Status</label>
-			<select class="custom dropdown"name="priority" id="status" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
+			<select class="small" id="status" name="priority" onchange="location='<?php echo $_SERVER['PHP_SELF']; ?>?changestatus&id=<?php echo $issue['id']; ?>&status='+this.value">
 				<?php foreach($STATUSES as $code=>$name): ?>
 					<option value="<?php echo $code; ?>"<?php echo ($issue['status']==$code?"selected":""); ?>><?php echo $name; ?></option>
 				<?php endforeach; ?>
 			</select>
-		</form>
-		<div class='left'>
-			<form method="POST">
-				<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
-				<?php
-				if ($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])===FALSE)
-					echo "<input type='submit' class='button secondary small' name='watch' value='Watch' />\n";
-				else
-					echo "<input type='submit' class='button alert small' name='unwatch' value='Unwatch' />\n";
-				?>
-			</form>
 		</div>
-		<div class='clear'></div>
-		<div id="comments">
+	</form>
+	<div class='row'>
+		<form method="POST">
+			<input type="hidden" name="id" value="<?php echo $issue['id']; ?>" />
 			<?php
-			if (count($comments)>0) echo "<h3>Comments</h3>\n";
-			foreach ($comments as $comment){
-				echo "<div class='comment'><p>".nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>",htmlentities($comment['description'],ENT_COMPAT,"UTF-8") ) )."</p>";
-				echo "<div class='comment-meta'><em>{$comment['user']}</em> on <em>{$comment['entrytime']}</em> ";
-				if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$comment['user']) echo "<span class='right'><a href='{$_SERVER['PHP_SELF']}?deletecomment&id={$issue['id']}&cid={$comment['id']}' onclick='return confirm(\"Are you sure?\");'>Delete</a></span>";
-				echo "</div></div>\n";
-			}
+			if ($_SESSION['tit']['email']&&strpos($issue['notify_emails'],$_SESSION['tit']['email'])===FALSE)
+				echo "<input type='submit' class='button secondary small' name='watch' value='Watch' />\n";
+			else
+				echo "<input type='submit' class='button alert small' name='unwatch' value='Unwatch' />\n";
 			?>
-			<div id="comment-create">
-				<h4>Post a comment</h4>
-				<form method="POST">
-					<input type="hidden" name="issue_id" value="<?php echo $issue['id']; ?>" />
-					<textarea name="description" rows="5" cols="50"></textarea>
-					<label></label>
-					<input type="submit" class="button small" name="createcomment" value="Comment" />
-				</form>
-			</div>
-		</div>
+		</form>
 	</div>
+	<?php
+	if (count($comments)>0) echo "<div class='row'><h3>Comments</h3></div>\n";
+	foreach ($comments as $comment){
+		echo "<div class='row'><div class='comment panel radius'><p>".nl2br( preg_replace("/([a-z]+:\/\/\S+)/","<a href='$1'>$1</a>",htmlentities($comment['description'],ENT_COMPAT,"UTF-8") ) )."</p>";
+		echo "<div class='comment-meta small'><small><em>{$comment['user']}</em> on <em>{$comment['entrytime']}</em> ";
+		if ($_SESSION['tit']['admin'] || $_SESSION['tit']['username']==$comment['user']) echo "<span class='right'><a href='{$_SERVER['PHP_SELF']}?deletecomment&id={$issue['id']}&cid={$comment['id']}' onclick='return confirm(\"Are you sure?\");'>Delete</a></span>";
+		echo "</small></div></div></div>\n";
+	}
+	?>
+	<div class='row'>
+		<h4>Post a comment</h4>
+		<form method="POST">
+			<input type="hidden" name="issue_id" value="<?php echo $issue['id']; ?>" />
+			<textarea name="description" rows="5" cols="50"></textarea>
+			<label></label>
+			<input type="submit" class="button small" name="createcomment" value="Comment" />
+		</form>
+	</div>
+</div>
 <?php endif; ?>
 <footer class="row">
 	<div class="large-12 columns">
@@ -562,5 +566,6 @@ function setWatch($id,$addToWatch){
 	$(\'#my-trigger\').trigger(\'click\');
 </script>':'' ;
 ?>
+<script type="text/javascript" src="<?php echo $RESPONSIVETABLE_JS?>"></script>
 </body>
 </html>
