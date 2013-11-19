@@ -4,6 +4,7 @@
  *      SQLite based, single page Issue Tracker featuring Foundation
  *
  *      Copyright 2013 Nivek Hutchison <nivekhutchison at terribleideas dot org>
+ * 	Copyright 2010-2013 Jwalanta Shrestha <jwalanta at gmail dot com>
  *      GNU GPL
  */
 
